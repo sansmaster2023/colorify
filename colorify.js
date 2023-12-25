@@ -126,11 +126,23 @@
                         }
                     }
                 },
+                {
+                    opcode: 'getImageResolution',
+                    blockType: Scratch.BlockType.REPORTER,
+                    text: 'getImageResolution [URI]',
+                    arguments: {
+                        URI: {
+                            type: Scratch.ArgumentType.STRING,
+                            defaultValue: "sans"
+                        }
+                    }
+                },
             ]
             };
         }
         tint(args, util) {
             var target = util.target;
+            console.log(target);
             this.setTint(target, args.R, args.G, args.B);
         }
         setTint (renderedTarget, R,G,B) {
@@ -154,10 +166,25 @@
             var rgb = ((renderedTarget.tintR&0x0ff)<<16)|((renderedTarget.tintG&0x0ff)<<8)|(renderedTarget.tintB&0x0ff);
             return rgb;
         }
+        getImageResolution({URI}) {
+            return new Promise(async function(resolve, reject) {
+                if (!(await Scratch.canFetch(URI))) return reject();
+                // eslint-disable-next-line no-restricted-syntax
+                const image = new Image();
+                image.onload = function() {
+                    resolve(image.width.toString() + " " +image.height.toString());
+                }
+                image.src = URI;
+            });
+            
+
+        }
     }
 
     Scratch.extensions.register(new Colorify());
 })(Scratch);
+
+
 
 
 
